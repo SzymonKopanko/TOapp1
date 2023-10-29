@@ -13,14 +13,14 @@ public class WorkerEntity {
     private Long id;
     private String name;
     private String  surname;
-    private double monthly_salary;
+    private double monthlySalary;
     private String position;
     private LocalDateTime start_of_employment;
 
-    public WorkerEntity(String name, String surname, double monthly_salary, String position){
+    public WorkerEntity(String name, String surname, double monthlySalary, String position){
         this.name = name;
         this.surname = surname;
-        this.monthly_salary = monthly_salary;
+        this.monthlySalary = monthlySalary;
         this.position = position;
         this.start_of_employment = LocalDateTime.now();
     }
@@ -35,7 +35,7 @@ public class WorkerEntity {
         return "id: " + id + '\n' +
                 "name: " + name + '\n' +
                 "surname: " + surname + '\n' +
-                "monthly salary: " + monthly_salary + '\n' +
+                "monthly salary: " + monthlySalary + '\n' +
                 "position: " + position + '\n' +
                 "start of employment: " + start_of_employment.toLocalDate() + '\n';
     }

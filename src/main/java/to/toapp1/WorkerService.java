@@ -26,4 +26,8 @@ public class WorkerService {
     public List<WorkerEntity> showAllWorkers(){
         return workerRepository.findAll();
     }
+
+    public List<WorkerEntity> findBySalaryBetween(double min, double max){
+        return workerRepository.findByMonthlySalaryBetween(min, max);
+    }
 }

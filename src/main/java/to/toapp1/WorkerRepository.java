@@ -8,5 +8,6 @@ public interface WorkerRepository extends JpaRepository<WorkerEntity, Long> {
     List<WorkerEntity> findByName(String name);
     List<WorkerEntity> findBySurname(String surname);
     List<WorkerEntity> findByPosition(String position);
+    List<WorkerEntity> findByMonthlySalaryBetween(double min, double max);
 
 }

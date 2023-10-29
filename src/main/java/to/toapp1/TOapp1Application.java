@@ -22,7 +22,7 @@ public class TOapp1Application {
 
             while (true) {
                 System.out.println("Enter '1' to add a new worker, '2' to delete by surname," +
-                        "'3' to show all workers, '0' to stop:");
+                        "'3' to show all workers, '4' to find all workers by salary range, '0' to stop:");
                 String userInput = scanner.nextLine();
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
@@ -33,6 +33,7 @@ public class TOapp1Application {
                     case "1" -> addWorkerFromTerminal(workerService, scanner);
                     case "2" -> deleteWorkersBySurnameFromTerminal(workerService, scanner);
                     case "3" -> showAllWorkersInTerminal(workerService);
+                    case "4" -> findWorkersBySalaryRangeInTerminal(workerService, scanner);
                     default -> System.out.println("Invalid input. Please try again.");
                 }
             }
@@ -55,7 +56,7 @@ public class TOapp1Application {
         workerService.addWorker(newWorker);
     }
     void deleteWorkersBySurnameFromTerminal(WorkerService workerService, Scanner scanner){
-        System.out.println("Enter surnname:");
+        System.out.println("Enter surname:");
         String surname = scanner.nextLine();
         workerService.deleteAllWorkersBySurname(surname);
     }
@@ -68,6 +69,23 @@ public class TOapp1Application {
         else {
             System.out.println("Workers:");
             for(WorkerEntity worker : allWorkers){
+                System.out.println(worker.toString());
+            }
+        }
+    }
+
+    void findWorkersBySalaryRangeInTerminal(WorkerService workerService, Scanner scanner){
+        System.out.println("Enter worker's min monthly salary:");
+        double min = Double.parseDouble(scanner.nextLine());
+        System.out.println("Enter worker's max monthly salary:");
+        double max = Double.parseDouble(scanner.nextLine());
+        List<WorkerEntity> workers = workerService.findBySalaryBetween(min, max);
+        if(workers.isEmpty()){
+            System.out.println("No workers here.");
+        }
+        else {
+            System.out.println("Workers:");
+            for(WorkerEntity worker : workers){
                 System.out.println(worker.toString());
             }
         }
