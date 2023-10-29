@@ -5,7 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import javax.xml.validation.Validator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -17,6 +19,7 @@ public class TOapp1Application {
 
     @Bean
     public CommandLineRunner commandLineRunner (WorkerService workerService){
+
         return args -> {
             Scanner scanner = new Scanner(System.in);
 
@@ -57,19 +60,21 @@ public class TOapp1Application {
 
     void addWorkerFromTerminal(WorkerService workerService, Scanner scanner){
         System.out.println("Enter worker's name:");
-        String name = scanner.nextLine();
+        String name = InputValidator.getValidString(scanner);
 
         System.out.println("Enter worker's surname:");
-        String surname = scanner.nextLine();
+        String surname = InputValidator.getValidString(scanner);
 
         System.out.println("Enter worker's monthly salary:");
-        double monthly_salary = Double.parseDouble(scanner.nextLine());
+        double monthly_salary = InputValidator.getValidMonthlySalary(scanner);
 
         System.out.println("Enter worker's position:");
-        String position = scanner.nextLine();
+        String position = InputValidator.getValidString(scanner);
+
         WorkerEntity newWorker = new WorkerEntity(name, surname, monthly_salary, position);
         workerService.addWorker(newWorker);
     }
+
     void deleteWorkersBySurnameFromTerminal(WorkerService workerService, Scanner scanner){
         System.out.println("Enter surname:");
         String surname = scanner.nextLine();
@@ -91,9 +96,12 @@ public class TOapp1Application {
 
     void showWorkersBySalaryRangeInTerminal(WorkerService workerService, Scanner scanner){
         System.out.println("Enter worker's min monthly salary:");
-        double min = Double.parseDouble(scanner.nextLine());
+        double min = InputValidator.getValidMonthlySalary((scanner));
         System.out.println("Enter worker's max monthly salary:");
-        double max = Double.parseDouble(scanner.nextLine());
+        double max = InputValidator.getValidMonthlySalary((scanner));
+        if(min >= max) {
+            System.out.println("Min monthly salary has to be lower than max monthly salary.");
+        }
         List<WorkerEntity> workers = workerService.findBySalaryBetween(min, max);
         if(workers.isEmpty()){
             System.out.println("No workers here.");
@@ -108,63 +116,88 @@ public class TOapp1Application {
 
     void updatedWorkerByID(WorkerService workerService, Scanner scanner) {
         System.out.println("Enter ID of worker whom you want to update: (if you don't want to change it, just click ENTER)");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = InputValidator.getValidId(scanner);
 
         String name;
         String surname;
         Double monthlySalary;
         String position;
 
-        WorkerEntity workerToEdit = workerService.getByID(id);
+        try {
+            WorkerEntity workerToEdit = workerService.getByID(id);
+            System.out.println("\nWorker with chosen ID:\n");
+            System.out.println(workerToEdit.toString());
 
-        System.out.println("If you want to change worker's name, insert it:");
-        name = scanner.nextLine();
-        if (name.isEmpty()) {
-            name = workerToEdit.getName();
-        } 
+            System.out.println("If you want to change worker's name, insert it:");
+            name = scanner.nextLine();
+            if (name.isEmpty()) {
+                name = workerToEdit.getName();
+            } else {
+                name = InputValidator.getValidUpdatedString(name, scanner);
+            }
 
-        System.out.println("If you want to change worker's surname, insert it:");
-        surname = scanner.nextLine();
-        if (surname.isEmpty()) {
-            surname = workerToEdit.getSurname();
-        } 
+            System.out.println("If you want to change worker's surname, insert it:");
+            surname = scanner.nextLine();
+            if (surname.isEmpty()) {
+                surname = workerToEdit.getSurname();
+            } else {
+                surname = InputValidator.getValidUpdatedString(surname, scanner);
+            }
 
-        System.out.println("If you want to change worker's monthly salary, insert it:");
-        String strMonthlySalary = scanner.nextLine();
-        if (strMonthlySalary.isEmpty()) {
-            monthlySalary = workerToEdit.getMonthlySalary();
-        } else {
-            monthlySalary = Double.parseDouble(strMonthlySalary);
+            System.out.println("If you want to change worker's monthly salary, insert it:");
+            String strMonthlySalary = scanner.nextLine();
+            if (strMonthlySalary.isEmpty()) {
+                monthlySalary = workerToEdit.getMonthlySalary();
+            } else {
+                monthlySalary = InputValidator.getValidUpdatedMonthlySalary(strMonthlySalary, scanner);
+            }
+
+            System.out.println("If you want to change worker's position, insert it:");
+            position = scanner.nextLine();
+            if (position.isEmpty()) {
+                position = workerToEdit.getPosition();
+            } else {
+                position = InputValidator.getValidUpdatedString(position, scanner);
+            }
+
+            workerService.updateWorker(id, name, surname, monthlySalary, position);
+
+        } catch (NoSuchElementException e) {
+            System.out.println("No worked with that ID.");
+            return;
         }
-
-        System.out.println("If you want to change worker's position, insert it:");
-        position = scanner.nextLine();
-        if (position.isEmpty()) {
-            position = workerToEdit.getPosition();
-        }
-
-        workerService.updateWorker(id, name, surname, monthlySalary, position);
     }
 
     void deleteWorkerByID(WorkerService workerService, Scanner scanner) {
         System.out.println("Enter ID of worker that you want to delete:");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = InputValidator.getValidId(scanner);
 
-        workerService.deleteWorkerByID(id);
+        try {
+            workerService.deleteWorkerByID(id);
+        } catch (NoSuchElementException e) {
+            System.out.println("No worked with that ID.");
+            return;
+        }
     }
 
     void showWorkerByID(WorkerService workerService, Scanner scanner) {
         System.out.println("Enter ID of worker that you want to show:");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = InputValidator.getValidId(scanner);
 
-        WorkerEntity worker = workerService.getByID(id);
-        System.out.println("\nThe chosen worker\n");
-        System.out.println(worker.toString());
+        try {
+            WorkerEntity worker = workerService.getByID(id);
+            System.out.println("\nThe chosen worker\n");
+            System.out.println(worker.toString());
+        } catch (NoSuchElementException e) {
+            System.out.println("No worked with that ID.");
+            return;
+        }
+
     }
 
     void showWorkerByPosition(WorkerService workerService, Scanner scanner) {
         System.out.println("Enter worker's position:");
-        String position = scanner.nextLine();
+        String position = InputValidator.getValidString(scanner);
 
         List<WorkerEntity> workers = workerService.findWorkerByPosition(position);
 
@@ -186,7 +219,7 @@ public class TOapp1Application {
 
     void deleteWorkersByPosition(WorkerService workerService, Scanner scanner) {
         System.out.println("Enter worker's position:");
-        String position = scanner.nextLine();
+        String position = InputValidator.getValidString(scanner);
         workerService.deleteWorkersByPosition(position);
         System.out.println("\nWORKERS WITH THIS POSITION DELETED\n");
     }

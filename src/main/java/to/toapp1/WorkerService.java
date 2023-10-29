@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class WorkerService {
@@ -49,9 +50,7 @@ public class WorkerService {
         return workerRepository.findByMonthlySalaryBetween(min, max);
     }
 
-    public WorkerEntity getByID(Long id) {
-        return workerRepository.findById(id).get();
-    }
+    public WorkerEntity getByID(Long id) { return workerRepository.findById(id).get(); }
 
     public void updateWorker(Long oldID, String name, String surname, Double monthlySalary, String position) {
         
