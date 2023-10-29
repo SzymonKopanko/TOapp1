@@ -21,8 +21,17 @@ public class TOapp1Application {
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
-                System.out.println("Enter '1' to add a new worker, '2' to delete by surname," +
-                        "'3' to show all workers, '4' to find all workers by salary range, '0' to stop:");
+                System.out.println("Enter: \n '1' to add a new worker" +
+                                   "\n '2' to delete all workers with the same surname" +
+                                   "\n '3' to delete worker by ID" +
+                                   "\n '4' to show all workers" +
+                                   "\n '5' to show worker by ID" +
+                                   "\n '6' to find all workers by salary range" +
+                                   "\n '7' to update worker by ID" +
+                                   "\n '8' to find worker by position" +
+                                   "\n '9' to delete all workers" +
+                                   "\n '10' to delete worker by position" +
+                                   "\n '0' to stop:");
                 String userInput = scanner.nextLine();
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
@@ -32,8 +41,14 @@ public class TOapp1Application {
                     }
                     case "1" -> addWorkerFromTerminal(workerService, scanner);
                     case "2" -> deleteWorkersBySurnameFromTerminal(workerService, scanner);
-                    case "3" -> showAllWorkersInTerminal(workerService);
-                    case "4" -> findWorkersBySalaryRangeInTerminal(workerService, scanner);
+                    case "3" -> deleteWorkerByID(workerService, scanner);
+                    case "4" -> showAllWorkersInTerminal(workerService);
+                    case "5" -> showWorkerByID(workerService, scanner);
+                    case "6" -> showWorkersBySalaryRangeInTerminal(workerService, scanner);
+                    case "7" -> updatedWorkerByID(workerService, scanner);
+                    case "8" -> showWorkerByPosition(workerService, scanner);
+                    case "9" -> deleteAllWorkers(workerService);
+                    case "10" -> deleteWorkersByPosition(workerService, scanner);
                     default -> System.out.println("Invalid input. Please try again.");
                 }
             }
@@ -74,7 +89,7 @@ public class TOapp1Application {
         }
     }
 
-    void findWorkersBySalaryRangeInTerminal(WorkerService workerService, Scanner scanner){
+    void showWorkersBySalaryRangeInTerminal(WorkerService workerService, Scanner scanner){
         System.out.println("Enter worker's min monthly salary:");
         double min = Double.parseDouble(scanner.nextLine());
         System.out.println("Enter worker's max monthly salary:");
@@ -89,5 +104,90 @@ public class TOapp1Application {
                 System.out.println(worker.toString());
             }
         }
+    }
+
+    void updatedWorkerByID(WorkerService workerService, Scanner scanner) {
+        System.out.println("Enter ID of worker whom you want to update: (if you don't want to change it, just click ENTER)");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        String name;
+        String surname;
+        Double monthlySalary;
+        String position;
+
+        WorkerEntity workerToEdit = workerService.getByID(id);
+
+        System.out.println("If you want to change worker's name, insert it:");
+        name = scanner.nextLine();
+        if (name.isEmpty()) {
+            name = workerToEdit.getName();
+        } 
+
+        System.out.println("If you want to change worker's surname, insert it:");
+        surname = scanner.nextLine();
+        if (surname.isEmpty()) {
+            surname = workerToEdit.getSurname();
+        } 
+
+        System.out.println("If you want to change worker's monthly salary, insert it:");
+        String strMonthlySalary = scanner.nextLine();
+        if (strMonthlySalary.isEmpty()) {
+            monthlySalary = workerToEdit.getMonthlySalary();
+        } else {
+            monthlySalary = Double.parseDouble(strMonthlySalary);
+        }
+
+        System.out.println("If you want to change worker's position, insert it:");
+        position = scanner.nextLine();
+        if (position.isEmpty()) {
+            position = workerToEdit.getPosition();
+        }
+
+        workerService.updateWorker(id, name, surname, monthlySalary, position);
+    }
+
+    void deleteWorkerByID(WorkerService workerService, Scanner scanner) {
+        System.out.println("Enter ID of worker that you want to delete:");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        workerService.deleteWorkerByID(id);
+    }
+
+    void showWorkerByID(WorkerService workerService, Scanner scanner) {
+        System.out.println("Enter ID of worker that you want to show:");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        WorkerEntity worker = workerService.getByID(id);
+        System.out.println("\nThe chosen worker\n");
+        System.out.println(worker.toString());
+    }
+
+    void showWorkerByPosition(WorkerService workerService, Scanner scanner) {
+        System.out.println("Enter worker's position:");
+        String position = scanner.nextLine();
+
+        List<WorkerEntity> workers = workerService.findWorkerByPosition(position);
+
+        if(workers.isEmpty()){
+            System.out.println("No workers here.");
+        }
+        else {
+            System.out.println("Workers with this position:");
+            for(WorkerEntity worker : workers){
+                System.out.println(worker.toString());
+            }
+        }
+    }
+
+    void deleteAllWorkers(WorkerService workerService) {
+        workerService.deleteAllWorkers();
+        System.out.println("\nALL WORKERS DELETED!\n");
+    }
+
+    void deleteWorkersByPosition(WorkerService workerService, Scanner scanner) {
+        System.out.println("Enter worker's position:");
+        String position = scanner.nextLine();
+        workerService.deleteWorkersByPosition(position);
+        System.out.println("\nWORKERS WITH THIS POSITION DELETED\n");
     }
 }

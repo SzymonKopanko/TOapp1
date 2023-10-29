@@ -2,6 +2,7 @@ package to.toapp1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -23,11 +24,42 @@ public class WorkerService {
         return workersToDelete;
     }
 
+    public void deleteWorkerByID(Long id) {
+        workerRepository.deleteById(id);
+    }
+
+    public void deleteWorkersByPosition(String position) {
+        List<WorkerEntity> workersToDelete = workerRepository.findByPosition(position);
+        workerRepository.deleteAll(workersToDelete);
+    }
+
+    public void deleteAllWorkers() {
+        workerRepository.deleteAll();
+    }
+
     public List<WorkerEntity> showAllWorkers(){
         return workerRepository.findAll();
     }
 
+    public List<WorkerEntity> findWorkerByPosition(String position) {
+        return workerRepository.findByPosition(position);
+    }
+
     public List<WorkerEntity> findBySalaryBetween(double min, double max){
         return workerRepository.findByMonthlySalaryBetween(min, max);
+    }
+
+    public WorkerEntity getByID(Long id) {
+        return workerRepository.findById(id).get();
+    }
+
+    public void updateWorker(Long oldID, String name, String surname, Double monthlySalary, String position) {
+        
+        deleteWorkerByID(oldID);
+
+        WorkerEntity updatedWorker = new WorkerEntity(name, surname, monthlySalary, position);
+            
+        addWorker(updatedWorker);
+
     }
 }
