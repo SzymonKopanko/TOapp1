@@ -100,4 +100,11 @@ public class WorkerServiceTest {
         assertEquals(worker.getId(), foundWorker.getId());
     }
 
+    @Test
+    void updateWorkerTest() {
+        when(workerRepository.save(any(WorkerEntity.class))).thenReturn(worker);
+        workerService.updateWorker(worker.getId(), worker.getName(), worker.getSurname(), worker.getMonthlySalary(), worker.getPosition());
+        verify(workerRepository, times(1)).save(any(WorkerEntity.class));
+    }
+
 }
