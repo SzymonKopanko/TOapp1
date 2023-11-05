@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import javax.xml.validation.Validator;
 import java.util.List;
@@ -18,6 +19,7 @@ public class TOapp1Application {
     }
 
     @Bean
+    @Profile("!test")
     public CommandLineRunner commandLineRunner (WorkerService workerService){
 
         return args -> {
